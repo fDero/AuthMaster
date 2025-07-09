@@ -1,12 +1,12 @@
-import hashlib
 import pymongo
-from pymongo import *
+from hashlib import sha256
+from random import randint
 from exceptions import *
 from __init__ import *
 
 
-def mongodb_connection_setup(args):
-    mongo_client = MongoClient(args.mongodb_connection_string)
+def mongodb_connection_setup(args) -> pymongo.collection.Collection:
+    mongo_client = pymongo.MongoClient(args.mongodb_connection_string)
     mongo_db = mongo_client[args.mongodb_database_name]
     mongo_collection = mongo_db[args.mongodb_collection_name]
     mongo_collection.create_index("uname", unique=True)
@@ -14,17 +14,17 @@ def mongodb_connection_setup(args):
     return mongo_collection
 
 
-def get_hashed_password_object(salt : str, plain_text_password: str):
+def get_hashed_password_object(salt : str, plain_text_password: str) -> dict:
     salted_password = f"{salt}{plain_text_password}"
     encoded_password = salted_password.encode()
     return {
-        "hash": hashlib.sha256(encoded_password).hexdigest(),
+        "hash": sha256(encoded_password).hexdigest(),
         "salt": salt,
         "algo": "sha256"
     }
 
 
-def get_registration_timestamp_object():
+def get_registration_timestamp_object() -> dict:
     from datetime import datetime
     return {
         "timestamp": datetime.utcnow().isoformat(),
@@ -33,26 +33,27 @@ def get_registration_timestamp_object():
     }
 
 
-def get_new_account_status_object(email_otp: str):
+def get_new_account_status_object() -> dict:
     return {
         "status": "unverified",
-        "email-otp": email_otp, 
+        "email-otp": randint(10000, 99999), 
         "attempts": 0,
     }
 
 
-def register_with_authmaster(mongodb, db_owner : str, email: str, username: str, plain_text_password: str) -> str:
+def register_with_authmaster(mongodb, db_owner : str, email: str, username: str, plain_text_password: str) -> dict:
     account = {
         "owner": db_owner,
         "email": email,        
-        "state": get_new_account_status_object(email_otp=email),
+        "state": get_new_account_status_object(),
         "uname": username,
         "passw": get_hashed_password_object(salt=email, plain_text_password=plain_text_password),
         "since": get_registration_timestamp_object()
     }
     try:
         res = mongodb.insert_one(account)
-        return str(res.inserted_id)
+        account["_id"] = str(res.inserted_id)
+        return account
 
     except pymongo.errors.DuplicateKeyError:
         raise AccountAlreadyExistsException()
