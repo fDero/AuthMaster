@@ -4,9 +4,15 @@ from pymongo import *
 from exceptions import *
 from __init__ import *
 
-mongo_client = MongoClient(MONGODB_CONNECTION_STRING)
-mongo_db = mongo_client[MONGODB_DATABASE_NAME]
-mongo_collection = mongo_db[MONGODB_COLLECTION_NAME]
+
+def mongodb_connection_setup(args):
+    mongo_client = MongoClient(args.mongodb_connection_string)
+    mongo_db = mongo_client[args.mongodb_database_name]
+    mongo_collection = mongo_db[args.mongodb_collection_name]
+    mongo_collection.create_index("uname", unique=True)
+    mongo_collection.create_index("email", unique=True)
+    return mongo_collection
+
 
 def get_hashed_password_object(salt : str, plain_text_password: str):
     salted_password = f"{salt}{plain_text_password}"
@@ -17,6 +23,7 @@ def get_hashed_password_object(salt : str, plain_text_password: str):
         "algo": "sha256"
     }
 
+
 def get_registration_timestamp_object():
     from datetime import datetime
     return {
@@ -25,6 +32,7 @@ def get_registration_timestamp_object():
         "format": "ISO 8601"
     }
 
+
 def get_new_account_status_object(email_otp: str):
     return {
         "status": "unverified",
@@ -32,19 +40,19 @@ def get_new_account_status_object(email_otp: str):
         "attempts": 0,
     }
 
-def register_with_authmaster(email: str, username: str, plain_text_password: str):
-    mongo_collection.create_index("email", unique=True)
-    mongo_collection.create_index("username", unique=True)
+
+def register_with_authmaster(mongodb, db_owner : str, email: str, username: str, plain_text_password: str) -> str:
     account = {
-        "owner": AUTHMASTER_OWNER,
+        "owner": db_owner,
         "email": email,        
         "state": get_new_account_status_object(email_otp=email),
         "uname": username,
-        "passw": get_hashed_password_object(email, plain_text_password),
+        "passw": get_hashed_password_object(salt=email, plain_text_password=plain_text_password),
         "since": get_registration_timestamp_object()
     }
     try:
-        mongo_collection.insert_one(account)
+        res = mongodb.insert_one(account)
+        return str(res.inserted_id)
 
     except pymongo.errors.DuplicateKeyError:
         raise AccountAlreadyExistsException()
