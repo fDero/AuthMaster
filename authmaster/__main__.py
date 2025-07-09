@@ -8,7 +8,11 @@ from persistence import *
 if __name__ == '__main__':
     parser = setup_cli_parser_startup()
     args = parser.parse_args()
-    mongodb = mongodb_connection_setup(args)
+
+    app.config["MONGODB"] = mongodb_connection_setup(args)
+    app.config["SMTP"] = setup_smtp_info(args)
+    app.config["OWNER"] = args.db_owner
+
     app.run(
         debug=args.debug, 
         port=args.port, 
