@@ -1,5 +1,6 @@
 from argparse import *
 
+
 def setup_port_cli_param(parser: ArgumentParser):
     parser.add_argument(
         "-p", "--port",
@@ -9,6 +10,7 @@ def setup_port_cli_param(parser: ArgumentParser):
         help="Port to run the server on (default: 8080)"
     )
 
+
 def setup_debug_cli_flag(parser: ArgumentParser):
     parser.add_argument(
         "-d", "--debug",
@@ -16,6 +18,7 @@ def setup_debug_cli_flag(parser: ArgumentParser):
         default=False,
         help="Enable debug mode"
     )
+
 
 def setup_mongodb_connection_string_cli_param(parser: ArgumentParser):
     parser.add_argument(
@@ -25,6 +28,7 @@ def setup_mongodb_connection_string_cli_param(parser: ArgumentParser):
         help="MongoDB connection string (default: mongodb://localhost:27017)"
     )
 
+
 def setup_mongodb_database_name_cli_param(parser: ArgumentParser):
     parser.add_argument(
         "--mongodb-database-name",
@@ -33,6 +37,7 @@ def setup_mongodb_database_name_cli_param(parser: ArgumentParser):
         help="MongoDB database name (default: authmaster)"
     )
 
+
 def setup_mongodb_collection_name_cli_param(parser: ArgumentParser):
     parser.add_argument(
         "--mongodb-collection-name",
@@ -40,6 +45,7 @@ def setup_mongodb_collection_name_cli_param(parser: ArgumentParser):
         default="users",
         help="MongoDB collection name (default: users)"
     )
+
 
 def setup_cli_parser_startup():
     parser = ArgumentParser()

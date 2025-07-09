@@ -4,6 +4,7 @@ from commandline import *
 from error_handling import *
 from persistence import *
 
+
 if __name__ == '__main__':
     parser = setup_cli_parser_startup()
     args = parser.parse_args()
