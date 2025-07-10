@@ -34,9 +34,10 @@ def get_registration_timestamp_object() -> dict:
 
 
 def get_new_account_status_object() -> dict:
+    otp_code = randint(10000, 99999)
     return {
         "status": "unverified",
-        "email-otp": randint(10000, 99999), 
+        "email-otp": str(otp_code), 
         "attempts": 0,
     }
 

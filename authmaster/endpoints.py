@@ -38,6 +38,41 @@ def authmaster_register():
     }), HTTPStatus.CREATED
 
 
+@app.route('/accounts/verify', methods=['POST'])
+def authmaster_verify():
+    data = flask_incoming_request.get_json()
+    email = data.get('email')
+    otp = data.get('verification-code')
+    if not email or not otp:
+        raise MissingRegistrationDataException()
+    mongodb = current_app.config["MONGODB"]
+    account = mongodb.find_one({"email": email})
+    if not account:
+        raise AccountAlreadyExistsException()
+    if account['state']['status'] != 'unverified':
+        return jsonify({
+            "status": "success",
+            "message": "Account already verified"
+        }), HTTPStatus.NOT_MODIFIED
+    if account['state']['email-otp'] != otp:
+        mongodb.update_one(
+            {"email": email},
+            {"$set": {"state.attempts": account['state']['attempts'] + 1}}
+        )
+        return jsonify({
+            "status": "error",
+            "message": "Invalid OTP"
+        }), HTTPStatus.UNAUTHORIZED
+    mongodb.update_one(
+        {"email": email},
+        {"$set": {"state.status": "verified"}}
+    )
+    return jsonify({
+        "status": "success",
+        "message": f"Account {email} has been verified successfully"
+    }), HTTPStatus.OK
+
+
 @app.route('/oauth/google', methods=['POST'])
 def oauth_google():
     data = flask_incoming_request.get_json()
