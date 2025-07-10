@@ -61,3 +61,24 @@ def register_with_authmaster(mongodb, db_owner : str, email: str, username: str,
     
     except Exception:
         raise DatabaseErrorException()
+
+
+def perform_otp_verification_and_update(mongodb, account: dict, otp: str):
+    attempts = account['state']['attempts']
+    wrong = account['state']['email-otp'] != otp
+    email = account['email']
+    failure = attempts >= 2 and wrong
+    if failure:
+        mongodb.remove({"email": email})
+        raise TooManyVerificationAttemptsException()
+    elif wrong:
+        mongodb.update_one(
+            {"email": email},
+            {"$set": {"state.attempts": account['state']['attempts'] + 1}}
+        )
+        raise VerificationAttemptFailedException()
+    else:
+        mongodb.update_one(
+            {"email": email},
+            {"$set": {"state.status": "verified"}}
+        )

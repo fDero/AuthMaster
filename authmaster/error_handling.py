@@ -34,3 +34,39 @@ def handle_account_already_exists(error):
 def handle_database_error(error):
     error_code = HTTPStatus.INTERNAL_SERVER_ERROR
     return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(MissingRegistrationDataException)
+def handle_missing_registration_data(error):
+    error_code = HTTPStatus.BAD_REQUEST
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(SmtpConnectionException)
+def handle_smtp_connection_error(error):
+    error_code = HTTPStatus.INTERNAL_SERVER_ERROR
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(AccountAlreadyVerifiedException)
+def handle_account_already_verified(error):
+    error_code = HTTPStatus.NOT_MODIFIED
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(TooManyVerificationAttemptsException)
+def handle_too_many_verification_attempts(error):
+    error_code = HTTPStatus.TOO_MANY_REQUESTS
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(VerificationAttemptFailedException)
+def handle_verification_attempt_failed(error):
+    error_code = HTTPStatus.UNAUTHORIZED
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(NoAccountToVerifyException)
+def handle_no_account_to_verify(error):
+    error_code = HTTPStatus.NOT_FOUND
+    return return_error_response(str(error), error_code)
