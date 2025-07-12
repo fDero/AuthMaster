@@ -14,7 +14,7 @@ def ping():
     return jsonify({"message": "ping request recieved correctly"})
 
 
-@app.route('/v1/oauth/google/validate', methods=['GET'])
+@app.route('/v1/oauth/google/validate', methods=['GET', 'HEAD'])
 def oauth_google_test() -> Response:
     data = flask_incoming_request.headers
     ensure_google_oauth_token_is_present(data)
