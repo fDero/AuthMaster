@@ -14,7 +14,21 @@ def ping():
     return jsonify({"message": "ping request recieved correctly"})
 
 
-@app.route('/v1/accounts/register', methods=['POST'])
+@app.route('/v1/oauth/google/validate', methods=['GET'])
+def oauth_google_test() -> Response:
+    data = flask_incoming_request.headers
+    ensure_google_oauth_token_is_present(data)
+    token = data.get('X-OAuth-Token')
+    response = requests.get(
+        GOOGLE_USERINFO_ENDPOINT,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    ensure_google_oauth_token_is_validated(response.status_code)
+    user_info = response.json()
+    return response_oauth_token_recognized(user_info, "Google")
+
+
+@app.route('/v1/accounts/register/init', methods=['POST'])
 def authmaster_register():
     data = flask_incoming_request.get_json()
     ensure_registration_request_fields_ok(data)
@@ -33,7 +47,7 @@ def authmaster_register():
     return response_account_registration_init_success(email)
 
 
-@app.route('/v1/accounts/verify', methods=['POST'])
+@app.route('/v1/accounts/register/verify', methods=['POST'])
 def authmaster_verify() -> Response:
     data = flask_incoming_request.get_json()
     email = data.get('email')
@@ -49,15 +63,17 @@ def authmaster_verify() -> Response:
     )
 
 
-@app.route('/v1/oauth/google', methods=['GET'])
-def oauth_google_test() -> Response:
-    data = flask_incoming_request.headers
-    ensure_google_oauth_token_is_present(data)
-    token = data.get('X-OAuth-Token')
-    response = requests.get(
-        GOOGLE_USERINFO_ENDPOINT,
-        headers={"Authorization": f"Bearer {token}"}
+@app.route('/v1/accounts/login', methods=['POST'])
+def authmaster_login() -> Response:
+    data = flask_incoming_request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    ensure_login_request_fields_ok(data)
+    mongodb = current_app.config["MONGODB"]
+    account = find_account_in_database(mongodb, data)
+    ensure_owner_is_correct(account, current_app.config["OWNER"])
+    ensure_account_to_login_was_found(account)
+    ensure_password_is_correct(account, password)
+    return response_account_login_success_response(
+        account, "EXAMPLE_JWT_TOKEN"
     )
-    ensure_google_oauth_token_is_validated(response.status_code)
-    user_info = response.json()
-    return response_oauth_token_recognized(user_info, "Google")

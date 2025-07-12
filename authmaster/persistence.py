@@ -14,7 +14,7 @@ def mongodb_connection_setup(args) -> pymongo.collection.Collection:
     return mongo_collection
 
 
-def get_hashed_password_object(salt : str, plain_text_password: str) -> dict:
+def get_hashed_password_object(salt: str, plain_text_password: str) -> dict:
     salted_password = f"{salt}{plain_text_password}"
     encoded_password = salted_password.encode()
     return {
@@ -42,7 +42,7 @@ def get_new_account_status_object() -> dict:
     }
 
 
-def register_with_authmaster(mongodb, db_owner : str, email: str, username: str, plain_text_password: str) -> dict:
+def register_with_authmaster(mongodb, db_owner: str, email: str, username: str, plain_text_password: str) -> dict:
     account = {
         "owner": db_owner,
         "email": email,        
@@ -82,3 +82,12 @@ def perform_otp_verification_and_update(mongodb, account: dict, otp: str):
             {"email": email},
             {"$set": {"state.status": "verified"}}
         )
+
+
+def find_account_in_database(mongodb, data: dict) -> dict:
+    email = data.get('email')
+    username = data.get('username')
+    if email:
+        return mongodb.find_one({"email": email})
+    else:
+        return mongodb.find_one({"uname": username})

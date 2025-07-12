@@ -46,3 +46,23 @@ class VerificationAttemptFailedException(Exception):
 class NoAccountToVerifyException(Exception):
     def __init__(self):
         super().__init__("No account to verify was found, please register first or check your email")
+
+
+class NoAccountToLoginException(Exception):
+    def __init__(self):
+        super().__init__("No account to login was found, please register first or check your email")
+
+
+class IncorrectPasswordException(Exception):
+    def __init__(self):
+        super().__init__("The provided password is incorrect, please try again")
+
+
+class AccountNotManagedByAuthmaster(Exception):
+    def __init__(self):
+        super().__init__("The account is not managed by Authmaster, please check the owner field")
+
+
+class MissingLoginDataException(Exception):
+    def __init__(self):
+        super().__init__("Missing login data: email, username, or password is not provided")

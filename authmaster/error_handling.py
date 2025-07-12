@@ -70,3 +70,27 @@ def handle_verification_attempt_failed(error):
 def handle_no_account_to_verify(error):
     error_code = HTTPStatus.NOT_FOUND
     return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(NoAccountToLoginException)
+def handle_no_account_to_login(error):
+    error_code = HTTPStatus.NOT_FOUND
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(IncorrectPasswordException)
+def handle_incorrect_password(error):
+    error_code = HTTPStatus.UNAUTHORIZED
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(AccountNotManagedByAuthmaster)
+def handle_account_not_managed_by_authmaster(error):
+    error_code = HTTPStatus.LOCKED
+    return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(MissingLoginDataException)
+def handle_missing_login_data(error):
+    error_code = HTTPStatus.BAD_REQUEST
+    return return_error_response(str(error), error_code)

@@ -35,7 +35,7 @@ def send_email(smtp_info: dict, recipient_email: str, subject: str, body: str):
         raise SmtpConnectionException()
 
 
-def send_verification_email(smtp_info : dict, account : dict):
+def send_verification_email(smtp_info: dict, account: dict):
     send_email(
         smtp_info,
         account["email"],

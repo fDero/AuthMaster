@@ -7,13 +7,12 @@ import json
 
 def response_account_verificaton_success_response(account : dict, jwt : str) -> Response:
     response_json = {
-        "status": "success",
+        "outcome": "success",
         "message": "Account successfully verified",
         "account": {
             "email": account['email'],
             "username": account['uname'],
             "id": str(account['_id']),
-            "status": account['state']['status'],
         }
     }
     response_headers = { "X-JWT-Token": jwt }
@@ -28,7 +27,7 @@ def response_account_verificaton_success_response(account : dict, jwt : str) -> 
 
 def response_account_registration_init_success(email: str) -> Response:
     response_json ={
-        "status": "success",
+        "outcome": "success",
         "message": f"An email has been sent to: {email}"
     }
     response_headers = {}
@@ -52,6 +51,26 @@ def response_oauth_token_recognized(user_info: dict, provider: str) -> Response:
         "id": user_info.get("id"),
         "picture": user_info.get("picture")
     }
+    return Response(
+        response=json.dumps(response_json),
+        status=response_status,
+        headers=response_headers,
+        mimetype="application/json"
+    )
+
+
+def response_account_login_success_response(account: dict, jwt: str) -> Response:
+    response_json = {
+        "outcome": "success",
+        "message": "Login successful",
+        "account": {
+            "email": account['email'],
+            "username": account['uname'],
+            "id": str(account['_id']),
+        }
+    }
+    response_headers = { "X-JWT-Token": jwt }
+    response_status = HTTPStatus.OK
     return Response(
         response=json.dumps(response_json),
         status=response_status,
