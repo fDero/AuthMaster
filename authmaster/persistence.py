@@ -1,6 +1,7 @@
 import pymongo
 from commons import *
 from random import randint
+from commons import *
 from exceptions import *
 from __init__ import *
 
@@ -26,7 +27,7 @@ def get_hashed_password_object(salt: str, plain_text_password: str, algo: str) -
 def get_registration_timestamp_object() -> dict:
     from datetime import datetime
     return {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": current_timestamp_datetime(),
         "timezone": "UTC",
         "format": "ISO 8601"
     }
