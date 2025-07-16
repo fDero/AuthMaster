@@ -1,5 +1,5 @@
 import pymongo
-from hashlib import sha256
+from commons import *
 from random import randint
 from exceptions import *
 from __init__ import *
@@ -14,13 +14,12 @@ def mongodb_connection_setup(args) -> pymongo.collection.Collection:
     return mongo_collection
 
 
-def get_hashed_password_object(salt: str, plain_text_password: str) -> dict:
+def get_hashed_password_object(salt: str, plain_text_password: str, algo: str) -> dict:
     salted_password = f"{salt}{plain_text_password}"
-    encoded_password = salted_password.encode()
     return {
-        "hash": sha256(encoded_password).hexdigest(),
+        "hash": encrypth_password(salted_password, algo),
         "salt": salt,
-        "algo": "sha256"
+        "algo": algo
     }
 
 
@@ -48,7 +47,7 @@ def register_with_authmaster(mongodb, db_owner: str, email: str, username: str, 
         "email": email,        
         "state": get_new_account_status_object(),
         "uname": username,
-        "passw": get_hashed_password_object(salt=email, plain_text_password=plain_text_password),
+        "passw": get_hashed_password_object(salt=email, plain_text_password=plain_text_password, algo="sha256"),
         "since": get_registration_timestamp_object()
     }
     try:

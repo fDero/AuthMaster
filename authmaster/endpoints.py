@@ -1,6 +1,7 @@
 from __init__ import *
 from flask import jsonify, current_app
 from flask import request as flask_incoming_request
+from commons import *
 from persistence import *
 from responses import *
 from validation import *
@@ -58,8 +59,10 @@ def authmaster_verify() -> Response:
     ensure_account_to_verify_was_found(account)
     ensure_account_is_not_yet_verified(account)
     perform_otp_verification_and_update(mongodb, account, otp)
+    jwt_secret = current_app.config["JWT_SECRET"]
+    jwt_token = create_jwt_token(account, jwt_secret, timedelta(days=1))
     return response_account_verificaton_success_response(
-        account, "EXAMPLE_JWT_TOKEN"
+        account, jwt_token
     )
 
 
@@ -74,6 +77,8 @@ def authmaster_login() -> Response:
     ensure_owner_is_correct(account, current_app.config["OWNER"])
     ensure_account_to_login_was_found(account)
     ensure_password_is_correct(account, password)
+    jwt_secret = current_app.config["JWT_SECRET"]
+    jwt_token = create_jwt_token(account, jwt_secret, timedelta(days=1))
     return response_account_login_success_response(
-        account, "EXAMPLE_JWT_TOKEN"
+        account, jwt_token
     )

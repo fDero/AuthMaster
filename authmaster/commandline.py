@@ -1,4 +1,5 @@
 from argparse import *
+import secrets
 
 
 def setup_port_cli_param(parser: ArgumentParser):
@@ -103,6 +104,15 @@ def setup_mongodb_collection_name_cli_param(parser: ArgumentParser):
     )
 
 
+def setup_jwt_secret_cli_param(parser: ArgumentParser):
+    default_jwt_secret = secrets.token_urlsafe(32)
+    parser.add_argument(
+        "--jwt-secret",
+        type=str,
+        default=default_jwt_secret,
+        help="Secret key for JWT token generation (default: randomly generated)"
+    )
+
 def setup_cli_parser_startup():
     parser = ArgumentParser()
     setup_debug_cli_flag(parser)
@@ -116,6 +126,7 @@ def setup_cli_parser_startup():
     setup_smtp_email_cli_param(parser)
     setup_smtp_server_cli_param(parser)
     setup_smtp_port_cli_param(parser)
+    setup_jwt_secret_cli_param(parser)
 
     setup_db_owner_cli_param(parser)
     return parser

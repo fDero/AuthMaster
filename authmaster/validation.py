@@ -59,7 +59,7 @@ def ensure_account_to_login_was_found(account: dict):
 def ensure_password_is_correct(account: dict, password: str):
     hashed_password = account['passw']['hash']
     salt = account['passw']['salt']
-    candidate_password_object = get_hashed_password_object(salt, password)
+    candidate_password_object = get_hashed_password_object(salt, password, "sha256")
     candidate_hashed_password = candidate_password_object['hash']
     if hashed_password != candidate_hashed_password:
         raise IncorrectPasswordException()
