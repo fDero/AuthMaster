@@ -1,4 +1,4 @@
-from hashlib import sha256
+from hashlib import *
 from datetime import *
 from secrets import *
 import jwt as pyjwt
@@ -15,7 +15,7 @@ def encrypth_password_sha256(salted_password: str) -> str:
 
 def encrypth_password_md5(salted_password: str) -> str:
     encoded_password = salted_password.encode()
-    return sha256(encoded_password).hexdigest()
+    return md5(encoded_password).hexdigest()
 
 
 def current_timestamp_datetime() -> datetime:
@@ -23,11 +23,11 @@ def current_timestamp_datetime() -> datetime:
 
 
 def encrypth_password(salted_password: str, algo: str) -> str:
-    if algo == "sha256":
-        return encrypth_password_sha256(salted_password)
-    if algo == "md5":
-        return encrypth_password_md5(salted_password)
-    raise ValueError(f"Unsupported hashing algorithm: {algo}")
+    encrypth_callbacks = {
+        'sha256': encrypth_password_sha256,
+        'md5': encrypth_password_md5
+    }
+    return encrypth_callbacks[algo](salted_password)
 
 
 def create_jwt_token(account: dict, secret_key: str, duration: timedelta) -> str:

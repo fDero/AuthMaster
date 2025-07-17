@@ -5,16 +5,17 @@ from http import HTTPStatus
 
 def parse_requested_encryption_algo(flask_incoming_request) -> str:
     algo = flask_incoming_request.headers.get('X-Requested-Password-Encryption-Algorithm')
-    choices = ["sha256", "md5"]
+    available_algos = AVAILABLE_ENCRYPTION_ALGORITHMS
+    default_algo = available_algos[0]
     if not algo:
-        return choices[0]
-    if algo not in choices:
-        raise InvalidEncryptionAlgorithmException(choices)
+        return default_algo
+    if algo not in available_algos:
+        raise InvalidEncryptionAlgorithmException()
     return algo
 
 
 def ensure_account_to_verify_was_found(account: dict):
-    if not account or "_id" not in account:
+    if not account or '_id' not in account:
         raise NoAccountToVerifyException()
 
 
@@ -62,14 +63,14 @@ def ensure_owner_is_correct(account: dict, authmaster_owner: str):
 
 
 def ensure_account_to_login_was_found(account: dict):
-    if not account or "_id" not in account:
+    if not account or '_id' not in account:
         raise NoAccountToLoginException()
 
 
 def ensure_password_is_correct(account: dict, password: str):
     hashed_password = account['passw']['hash']
     salt = account['passw']['salt']
-    candidate_password_object = get_hashed_password_object(salt, password, "sha256")
+    candidate_password_object = get_hashed_password_object(salt, password, 'sha256')
     candidate_hashed_password = candidate_password_object['hash']
     if hashed_password != candidate_hashed_password:
         raise IncorrectPasswordException()

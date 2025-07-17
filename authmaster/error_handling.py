@@ -6,9 +6,9 @@ from exceptions import *
 
 def return_error_response(message, error_code):
     return jsonify({
-        "status": "error",
-        "message": message,
-        "error-code": error_code
+        'status': 'error',
+        'message': message,
+        'error-code': error_code
     }), error_code
 
 
