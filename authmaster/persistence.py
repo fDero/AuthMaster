@@ -25,7 +25,6 @@ def get_hashed_password_object(salt: str, plain_text_password: str, algo: str) -
 
 
 def get_registration_timestamp_object() -> dict:
-    from datetime import datetime
     return {
         'timestamp': current_timestamp_datetime(),
         'timezone': 'UTC',
@@ -68,21 +67,15 @@ def perform_otp_verification_and_update(mongodb, account: dict, otp: str):
     attempts = account['state']['attempts']
     wrong = account['state']['email-otp'] != otp
     email = account['email']
-    failure = attempts >= 2 and wrong
-    if failure:
+    if attempts >= 2 and wrong:
         mongodb.remove({'email': email})
         raise TooManyVerificationAttemptsException()
-    elif wrong:
-        mongodb.update_one(
-            {'email': email},
-            {'$set': {'state.attempts': account['state']['attempts'] + 1}}
-        )
-        raise VerificationAttemptFailedException()
-    else:
-        mongodb.update_one(
-            {'email': email},
-            {'$set': {'state.status': 'verified'}}
-        )
+    new_status = 'unverified' if wrong else 'verified'
+    new_attempts = attempts + (1 if wrong else 0)
+    mongodb.update_one(
+        {'email': email},
+        {'$set': {'state.attempts': new_attempts, 'state.status': new_status}}
+    )
 
 
 def find_account_in_database(mongodb, data: dict) -> dict:
