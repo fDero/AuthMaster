@@ -33,9 +33,11 @@ def oauth_google_test() -> Response:
 def authmaster_register():
     data = flask_incoming_request.get_json()
     ensure_registration_request_fields_ok(data)
+    requested_algo = parse_requested_encryption_algo(flask_incoming_request)
     account = register_with_authmaster(
         current_app.config["MONGODB"], 
         current_app.config["OWNER"], 
+        requested_algo,
         data.get('email'), 
         data.get('username'), 
         data.get('password')

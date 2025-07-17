@@ -94,3 +94,9 @@ def handle_account_not_managed_by_authmaster(error):
 def handle_missing_login_data(error):
     error_code = HTTPStatus.BAD_REQUEST
     return return_error_response(str(error), error_code)
+
+
+@app.errorhandler(InvalidEncryptionAlgorithmException)
+def handle_invalid_encryption_algorithm(error):
+    error_code = HTTPStatus.BAD_REQUEST
+    return return_error_response(str(error), error_code)

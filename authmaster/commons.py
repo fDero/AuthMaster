@@ -1,6 +1,11 @@
 from hashlib import sha256
 from datetime import *
+from secrets import *
 import jwt as pyjwt
+
+
+def get_random_string(length: int = 16) -> str:
+    return token_urlsafe(length)
 
 
 def encrypth_password_sha256(salted_password: str) -> str:

@@ -1,5 +1,5 @@
 from argparse import *
-import secrets
+from commons import *
 
 
 def setup_port_cli_param(parser: ArgumentParser):
@@ -105,7 +105,7 @@ def setup_mongodb_collection_name_cli_param(parser: ArgumentParser):
 
 
 def setup_jwt_secret_cli_param(parser: ArgumentParser):
-    default_jwt_secret = secrets.token_urlsafe(32)
+    default_jwt_secret = get_random_string(32)
     parser.add_argument(
         "--jwt-secret",
         type=str,

@@ -42,13 +42,14 @@ def get_new_account_status_object() -> dict:
     }
 
 
-def register_with_authmaster(mongodb, db_owner: str, email: str, username: str, plain_text_password: str) -> dict:
+def register_with_authmaster(mongodb, db_owner: str, algo: str, email: str, username: str, plain_text_password: str) -> dict:
+    salt = get_random_string(32)
     account = {
         "owner": db_owner,
         "email": email,        
         "state": get_new_account_status_object(),
         "uname": username,
-        "passw": get_hashed_password_object(salt=email, plain_text_password=plain_text_password, algo="sha256"),
+        "passw": get_hashed_password_object(salt, plain_text_password, algo),
         "since": get_registration_timestamp_object()
     }
     try:

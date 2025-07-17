@@ -3,6 +3,16 @@ from persistence import *
 from http import HTTPStatus
 
 
+def parse_requested_encryption_algo(flask_incoming_request) -> str:
+    algo = flask_incoming_request.headers.get('X-Requested-Password-Encryption-Algorithm')
+    choices = ["sha256", "md5"]
+    if not algo:
+        return choices[0]
+    if algo not in choices:
+        raise InvalidEncryptionAlgorithmException(choices)
+    return algo
+
+
 def ensure_account_to_verify_was_found(account: dict):
     if not account or "_id" not in account:
         raise NoAccountToVerifyException()

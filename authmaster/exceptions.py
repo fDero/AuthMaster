@@ -66,3 +66,8 @@ class AccountNotManagedByAuthmaster(Exception):
 class MissingLoginDataException(Exception):
     def __init__(self):
         super().__init__("Missing login data: email, username, or password is not provided")
+
+
+class InvalidEncryptionAlgorithmException(Exception):
+    def __init__(self, choices: list):
+        super().__init__(f"Invalid encryption algorithm requested, supported algorithms are: {choices}")
