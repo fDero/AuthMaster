@@ -41,6 +41,15 @@ def get_new_account_status_object() -> dict:
     }
 
 
+def get_new_oauth_account_status_object(oauth_provider : str, oauth_id : str) -> dict:
+    otp_code = randint(10000, 99999)
+    return {
+        'status': 'verified',
+        'oauth-provider': oauth_provider,
+        'oauth-id': oauth_id,
+    }
+
+
 def register_with_authmaster(mongodb, db_owner: str, algo: str, email: str, username: str, plain_text_password: str) -> dict:
     salt = get_random_string(32)
     account = {
@@ -85,3 +94,30 @@ def find_account_in_database(mongodb, data: dict) -> dict:
         return mongodb.find_one({'email': email})
     else:
         return mongodb.find_one({'uname': username})
+
+
+def find_account_by_oauth_id(mongodb, provider: str, oauth_id: str) -> dict:
+    return mongodb.find_one({
+        'state.oauth-provider': provider,
+        'state.oauth-id': oauth_id
+    })
+
+
+def create_oauth_managed_account(mongodb, provider: str, data: dict) -> dict:
+    oauth_id = data.get('id')
+    new_account = mongodb.insert_one({
+        'owner': 'third-party',
+        'email': data.get('email'),
+        'uname': data.get('name'),
+        'state': get_new_oauth_account_status_object(provider, oauth_id),
+        'since': get_registration_timestamp_object()
+    })
+    new_account['_id'] = str(new_account.inserted_id)
+    return new_account
+
+
+def find_or_create_oauth_managed_account(mongodb, provider: str, data: dict) -> dict:
+    search_result = find_account_by_oauth_id(mongodb, provider, data.get('id'))
+    if not search_result:
+        return create_oauth_managed_account(mongodb, provider, data)
+    return search_result 

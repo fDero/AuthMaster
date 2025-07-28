@@ -5,7 +5,7 @@ from flask import Response
 import json
 
 
-def response_account_verificaton_success_response(account : dict, jwt : str) -> Response:
+def response_access_garanted_success_response(account : dict, jwt : str) -> Response:
     response_json = {
         'outcome': 'success',
         'message': 'Account successfully verified',
@@ -48,7 +48,7 @@ def response_oauth_token_recognized(user_info: dict, provider: str) -> Response:
     response_json = { 
         'email': user_info.get('email'),
         'name': user_info.get('name'),
-        'id': user_info.get('id'),
+        'oauth-id': f'{provider.lower()}/' + user_info.get('id'),
         'picture': user_info.get('picture')
     }
     return Response(

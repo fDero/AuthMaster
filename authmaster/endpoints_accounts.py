@@ -7,26 +7,6 @@ from responses import *
 from validation import *
 from mailing import *
 from exceptions import *
-import requests
-
-
-@app.route('/ping', methods=['GET', 'HEAD'])
-def ping():
-    return jsonify({'message': 'ping request recieved correctly'})
-
-
-@app.route('/v1/oauth/google/validate', methods=['GET', 'HEAD'])
-def oauth_google_validate() -> Response:
-    data = flask_incoming_request.headers
-    ensure_google_oauth_token_is_present(data)
-    token = data.get('X-OAuth-Token')
-    response = requests.get(
-        GOOGLE_USERINFO_ENDPOINT,
-        headers={'Authorization': f'Bearer {token}'}
-    )
-    ensure_google_oauth_token_is_validated(response.status_code)
-    user_info = response.json()
-    return response_oauth_token_recognized(user_info, 'Google')
 
 
 @app.route('/v1/accounts/register/init', methods=['POST'])
@@ -78,7 +58,7 @@ def authmaster_verify() -> Response:
     perform_otp_verification_and_update(mongodb, account, otp)
     jwt_secret = current_app.config['JWT_SECRET']
     jwt_token = create_jwt_token(account, jwt_secret, timedelta(days=1))
-    return response_account_verificaton_success_response(
+    return response_access_garanted_success_response(
         account, jwt_token
     )
 
