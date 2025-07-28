@@ -16,7 +16,7 @@ def ping():
 
 
 @app.route('/v1/oauth/google/validate', methods=['GET', 'HEAD'])
-def oauth_google_test() -> Response:
+def oauth_google_validate() -> Response:
     data = flask_incoming_request.headers
     ensure_google_oauth_token_is_present(data)
     token = data.get('X-OAuth-Token')
@@ -42,6 +42,21 @@ def authmaster_register():
         data.get('username'), 
         data.get('password')
     )
+    send_verification_email(
+        current_app.config['SMTP'],
+        account
+    )
+    email = data.get('email')
+    return response_account_registration_init_success(email)
+
+
+@app.route('/v1/accounts/register/retry', methods=['POST'])
+def authmaster_register():
+    data = flask_incoming_request.get_json()
+    ensure_registration_request_fields_ok(data)
+    account = find_account_in_database(current_app.config['MONGODB'], data)
+    ensure_account_to_verify_was_found(account)
+    ensure_account_is_not_yet_verified(account)
     send_verification_email(
         current_app.config['SMTP'],
         account
