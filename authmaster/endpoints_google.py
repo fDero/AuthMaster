@@ -1,5 +1,5 @@
 from __init__ import *
-from flask import jsonify, current_app
+from flask import current_app
 from flask import request as flask_incoming_request
 from commons import *
 from persistence import *
