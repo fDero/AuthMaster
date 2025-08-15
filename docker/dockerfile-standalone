@@ -1,0 +1,36 @@
+# RUN THE FOLLOWING COMMAND IN THE ROOT DIRECTORY
+# docker build -f .\docker\dockerfile-standalone -t authmaster .
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY ../authmaster ./authmaster
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 5000
+
+ENV db_owner=                                                \
+    smtp_server=                                             \
+    smtp_email=                                              \
+    smtp_passw=                                              \
+    smtp_port=....                                           \
+    mongodb_connection_string=                               \
+    mongodb_database_name=                                   \
+    mongodb_collection_name=                                 \
+    jwt_secret=                                              \
+    port=5000                                                \
+    debug=false
+
+CMD python authmaster                                        \
+    --db-owner "$db_owner"                                   \
+    --smtp-server "$smtp_server"                             \
+    --smtp-port "$smtp_port"                                 \
+    --smtp-email "$smtp_email"                               \
+    --smtp-passw "$smtp_passw"                               \
+    --mongodb-connection-string "$mongodb_connection_string" \
+    --mongodb-database-name "$mongodb_database_name"         \
+    --mongodb-collection-name "$mongodb_collection_name"     \
+    --jwt-secret "$jwt_secret"                               \
+    --port "$port"                                           \
+    --debug
