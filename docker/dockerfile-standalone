@@ -1,5 +1,20 @@
-# RUN THE FOLLOWING COMMAND IN THE ROOT DIRECTORY
+# RUN THE FOLLOWING COMMAND IN THE ROOT DIRECTORY TO BUILD
 # docker build -f .\docker\dockerfile-standalone -t authmaster .
+
+# RUN THE FOLLOWING COMMAND TO RUN
+#  docker run                                                 \
+#  -p 5000:5000                                               \
+#  -e smtp_passw="$SMTP_PASSWORD"                             \
+#  -e smtp_email="..."                                        \
+#  -e smtp_server="smtp.gmail.com"                            \
+#  -e smtp_port="587"                                         \
+#  -e mongodb_connection_string="..."                         \
+#  -e mongodb_database_name="..."                             \
+#  -e mongodb_collection_name="..."                           \
+#  -e jwt_secret="..."                                        \
+#  -e db_owner="..."                                          \
+#  authmaster
+
 FROM python:3.11-slim
 
 WORKDIR /app
