@@ -10,7 +10,7 @@ from exceptions import *
 
 
 @app.route('/v1/accounts/register/init', methods=['POST'])
-def authmaster_register():
+def authmaster_register_init():
     data = flask_incoming_request.get_json()
     ensure_registration_request_fields_ok(data)
     requested_algo = parse_requested_encryption_algo(flask_incoming_request)
@@ -31,7 +31,7 @@ def authmaster_register():
 
 
 @app.route('/v1/accounts/register/retry', methods=['POST'])
-def authmaster_register():
+def authmaster_register_retry():
     data = flask_incoming_request.get_json()
     ensure_registration_request_fields_ok(data)
     account = find_account_in_database(current_app.config['MONGODB'], data)

@@ -1,5 +1,5 @@
 from __init__ import app
-from authmaster.endpoints_accounts import *
+from endpoints_accounts import *
 from commandline import *
 from error_handling import *
 from persistence import *
